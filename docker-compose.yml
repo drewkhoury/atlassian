@@ -19,7 +19,7 @@ stash:
   links:
     - database
   volumes:
-    - atlassian-stash/home:/opt/stash-home
+    - /atlassian/atlassian-stash/home:/opt/stash-home
 
 jira:
   image: mhubig/atlassian-jira
@@ -27,7 +27,7 @@ jira:
   links:
     - database
   volumes:
-    - atlassian-jira/home:/opt/jira-home
+    - /atlassian/atlassian-jira/home:/opt/jira-home
 
 confluence:
   image: mhubig/atlassian-confluence
@@ -35,7 +35,7 @@ confluence:
   links:
     - database
   volumes:
-    - atlassian-confluence/home:/opt/confluence-home
+    - /atlassian/atlassian-confluence/home:/opt/confluence-home
 
 crowd:
   image: mhubig/atlassian-crowd
@@ -43,7 +43,7 @@ crowd:
   links:
     - database
   volumes:
-    - atlassian-crowd/home:/opt/crowd-home
+    - /atlassian/atlassian-crowd/home:/opt/crowd-home
 
 bamboo:
   image: mhubig/atlassian-bamboo
@@ -51,16 +51,16 @@ bamboo:
   links:
     - database
   volumes:
-    - atlassian-bamboo/home:/opt/bamboo-home
+    - /atlassian/atlassian-bamboo/home:/opt/bamboo-home
 
 database:
   image: postgres:9.4
   restart: always
   volumes:
     - data:/var/lib/postgresql/data
-    - atlassian-confluence/setup-confluence-db.sh:/docker-entrypoint-initdb.d/setup-confluence-db.sh
-    - atlassian-crowd/setup-crowd-db.sh:/docker-entrypoint-initdb.d/setup-crowd-db.sh
-    - atlassian-jira/setup-jira-db.sh:/docker-entrypoint-initdb.d/setup-jira-db.sh
-    - atlassian-stash/setup-stash-db.sh:/docker-entrypoint-initdb.d/setup-stash-db.sh
-    - atlassian-bamboo/setup-bamboo-db.sh:/docker-entrypoint-initdb.d/setup-bamboo-db.sh
+    - /atlassian/atlassian-confluence/setup-confluence-db.sh:/docker-entrypoint-initdb.d/setup-confluence-db.sh
+    - /atlassian/atlassian-crowd/setup-crowd-db.sh:/docker-entrypoint-initdb.d/setup-crowd-db.sh
+    - /atlassian/atlassian-jira/setup-jira-db.sh:/docker-entrypoint-initdb.d/setup-jira-db.sh
+    - /atlassian/atlassian-stash/setup-stash-db.sh:/docker-entrypoint-initdb.d/setup-stash-db.sh
+    - /atlassian/atlassian-bamboo/setup-bamboo-db.sh:/docker-entrypoint-initdb.d/setup-bamboo-db.sh
     - tmp:/tmp/dumps # import backups
