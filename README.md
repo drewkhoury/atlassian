@@ -2,7 +2,6 @@
 
 Make sure you set these variables:
 ```
-PATH_TO_YOUR_REPO=/data/repos/atlassian
 DOCKER_HOST_VM_NAME=default
 DOCKER_HOST_IP=$(docker-machine ip ${DOCKER_HOST_VM_NAME})
 ```
@@ -29,9 +28,10 @@ EOF
 
 Create the nginx image, then bring up the entire stack.
 ```
-sudo ln -s ${PATH_TO_YOUR_REPO} /atlassian
-cd /atlassian && docker build -t nginx_with_config . && docker-compose up
+docker build -t nginx_with_config . && docker-compose up
 ```
+
+Note: If you're not using a Linux docker host directly make sure you're running from a shared folder (e.g for OSX `/Users` is shared by default with VirtualBox).
 
 ## Atlassian services
 

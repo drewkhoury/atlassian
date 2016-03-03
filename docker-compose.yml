@@ -1,7 +1,4 @@
 # example usage:
-# 
-# PATH_TO_YOUR_REPO=/data/repos/atlassian
-# sudo ln -s ${PATH_TO_YOUR_REPO} /atlassian
 #
 # build nginx image, and bring up all containers (-d means in the background)
 # cd /atlassian && docker build -t nginx_with_config . && docker-compose up -d
@@ -25,7 +22,7 @@ nginx:
     - crowd
     - bamboo
   # volumes:
-  #   - nginx.conf:/etc/nginx/nginx.conf
+  #   - ./nginx:/etc/nginx
 
 stash:
   image: mhubig/atlassian-stash
@@ -33,7 +30,7 @@ stash:
   links:
     - database
   volumes:
-    - /atlassian/atlassian-stash/home:/opt/stash-home
+    - ./atlassian-stash/home:/opt/stash-home
 
 jira:
   image: mhubig/atlassian-jira
@@ -41,7 +38,7 @@ jira:
   links:
     - database
   volumes:
-    - /atlassian/atlassian-jira/home:/opt/jira-home
+    - ./atlassian-jira/home:/opt/jira-home
 
 confluence:
   image: mhubig/atlassian-confluence
@@ -49,7 +46,7 @@ confluence:
   links:
     - database
   volumes:
-    - /atlassian/atlassian-confluence/home:/opt/confluence-home
+    - ./atlassian-confluence/home:/opt/confluence-home
 
 crowd:
   image: mhubig/atlassian-crowd
@@ -57,7 +54,7 @@ crowd:
   links:
     - database
   volumes:
-    - /atlassian/atlassian-crowd/home:/opt/crowd-home
+    - ./atlassian-crowd/home:/opt/crowd-home
 
 bamboo:
   image: mhubig/atlassian-bamboo
@@ -65,16 +62,12 @@ bamboo:
   links:
     - database
   volumes:
-    - /atlassian/atlassian-bamboo/home:/opt/bamboo-home
+    - ./atlassian-bamboo/home:/opt/bamboo-home
 
 database:
   image: postgres:9.4
   restart: always
   volumes:
     - data:/var/lib/postgresql/data
-    - /atlassian/atlassian-confluence/setup-confluence-db.sh:/docker-entrypoint-initdb.d/setup-confluence-db.sh
-    - /atlassian/atlassian-crowd/setup-crowd-db.sh:/docker-entrypoint-initdb.d/setup-crowd-db.sh
-    - /atlassian/atlassian-jira/setup-jira-db.sh:/docker-entrypoint-initdb.d/setup-jira-db.sh
-    - /atlassian/atlassian-stash/setup-stash-db.sh:/docker-entrypoint-initdb.d/setup-stash-db.sh
-    - /atlassian/atlassian-bamboo/setup-bamboo-db.sh:/docker-entrypoint-initdb.d/setup-bamboo-db.sh
-    - tmp:/tmp/dumps # import backups
+    - ./database-scripts:/docker-entrypoint-initdb.d
+    - ./tmp:/tmp/dumps # import backups
