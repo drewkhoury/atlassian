@@ -1,12 +1,37 @@
 ### I'm in the fast lane
 
+Make sure you set these variables:
 ```
 PATH_TO_YOUR_REPO=/data/repos/atlassian
+DOCKER_HOST_VM_NAME=default
+DOCKER_HOST_IP=$(docker-machine ip ${DOCKER_HOST_VM_NAME})
+```
+
+Update your docker host VM to have enough resources for the entire stack.
+
+WARNING: This will make changes to your docker host, so consider other containers you may be running. Also consider if your workstation has enough resources to support these changes.
+```
+MEMORY=5120
+CPUs=4
+
+VBoxManage controlvm ${DOCKER_HOST_VM_NAME} poweroff
+VBoxManage modifyvm  ${DOCKER_HOST_VM_NAME} --memory ${MEMORY}
+VBoxManage modifyvm  ${DOCKER_HOST_VM_NAME} --cpus ${CPUs}
+VBoxManage startvm   ${DOCKER_HOST_VM_NAME} --type headless
+```
+
+Make sure your containers have addressable hostnames:
+```
+cat <<EOF | sudo tee -a /etc/hosts > /dev/null
+${DOCKER_HOST_IP} crowd.docker stash.docker bamboo.docker jira.docker confluence.docker
+EOF
+```
+
+Create the nginx image, then bring up the entire stack.
+```
 sudo ln -s ${PATH_TO_YOUR_REPO} /atlassian
 cd /atlassian && docker build -t nginx_with_config . && docker-compose up
 ```
-
-Warning: You'll probably run out of memory on a default 1gb docker host. See the sections below for detailed instructions.
 
 ## Atlassian services
 
