@@ -1,5 +1,19 @@
+# example usage:
+# 
+# PATH_TO_YOUR_REPO=/data/repos/atlassian
+# sudo ln -s ${PATH_TO_YOUR_REPO} /atlassian
+#
+# build nginx image, and bring up all containers (-d means in the background)
+# cd /atlassian && docker build -t nginx_with_config . && docker-compose up -d
+#
+# docker stats # to monitor memory usage (confluence may take up to 2GB, give your docker host at least 4GB total)
+# docker logs
+
+
+
+# create nginx image with `cd /atlassian && docker build -t nginx_with_config .`
 nginx:
-  image: nginx:1.9
+  image: nginx_with_config
   restart: always
   ports:
     - "80:80"
@@ -10,8 +24,8 @@ nginx:
     - confluence
     - crowd
     - bamboo
-  volumes:
-    - nginx.conf:/etc/nginx/nginx.conf
+  # volumes:
+  #   - nginx.conf:/etc/nginx/nginx.conf
 
 stash:
   image: mhubig/atlassian-stash

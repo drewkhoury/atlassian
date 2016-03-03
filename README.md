@@ -1,3 +1,13 @@
+### I'm in the fast lane
+
+```
+PATH_TO_YOUR_REPO=/data/repos/atlassian
+sudo ln -s ${PATH_TO_YOUR_REPO} /atlassian
+cd /atlassian && docker build -t nginx_with_config . && docker-compose up
+```
+
+Warning: You'll probably run out of memory on a default 1gb docker host. See the sections below for detailed instructions.
+
 ## Atlassian services
 
     Version: 1.1.0
@@ -22,10 +32,31 @@ instructions please refere to the origin websites:
   - [https://docs.docker.com/installation][8]
   - [https://docs.docker.com/compose][9]
 
+### Preperation
+
+Due to a bug in how Docker deals with local volumes you'll need to symlink from `/atlassian` to your repo.
+
+```
+PATH_TO_YOUR_REPO=/data/repos/atlassian
+sudo ln -s ${PATH_TO_YOUR_REPO} /atlassian
+```
+
+Due to the same bug, you'll need to create a custom nginx image.
+
+```
+cd /atlassian && docker build -t nginx_with_config .
+```
+
+Make sure you have enough memory on your Docker host to handle the 7 containers.
+```
+docker stats # to monitor memory usage (confluence may take up to 2GB, give your docker host at least 4GB total)
+docker logs
+```
+
 ### Start the images
 
 You can start all images as a orchestration from the root folder. To
-only use a particularly image change into a subfolder. You better use
+only use a particular image change into a subfolder. You better use
 the `docker-compose-dev.yml` file if you're not in production. Here
 are some examples:
 
