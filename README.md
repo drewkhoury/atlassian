@@ -49,6 +49,16 @@ cd /atlassian && docker build -t nginx_with_config .
 
 Make sure you have enough memory on your Docker host to handle the 7 containers.
 ```
+# update your docker host VM with enough resources to handle the entire Atlassian stack
+VM_NAME=default
+MEMORY=5120
+CPUs=4
+
+VBoxManage controlvm ${VM_NAME} poweroff
+VBoxManage modifyvm  ${VM_NAME} --memory ${MEMORY}
+VBoxManage modifyvm  ${VM_NAME} --cpus ${CPUs}
+VBoxManage startvm   ${VM_NAME} --type headless
+
 docker stats # to monitor memory usage (confluence may take up to 2GB, give your docker host at least 4GB total)
 docker logs
 ```
