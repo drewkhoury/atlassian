@@ -1,6 +1,6 @@
 # I'm in the fast lane
 
-We recommend at least reading through [Preperation](#Preperation) first. Once you're ready, bringing up the containers is easy.
+We recommend at least reading through [Preperation](#preperation) first. Once you're ready, bringing up the containers is easy.
 
 Here's what it looks like on a Mac:
 ```
