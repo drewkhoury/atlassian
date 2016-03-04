@@ -1,37 +1,12 @@
-### I'm in the fast lane
+# I'm in the fast lane
 
-Make sure you set these variables:
-```
-DOCKER_HOST_VM_NAME=default
-DOCKER_HOST_IP=$(docker-machine ip ${DOCKER_HOST_VM_NAME})
-```
+We recommend at least reading through [Preperation](#Preperation) first. Once you're ready, bringing up the containers is easy.
 
-Update your docker host VM to have enough resources for the entire stack.
-
-WARNING: This will make changes to your docker host, so consider other containers you may be running. Also consider if your workstation has enough resources to support these changes.
+Here's what it looks like on a Mac:
 ```
-MEMORY=5120
-CPUs=4
-
-VBoxManage controlvm ${DOCKER_HOST_VM_NAME} poweroff
-VBoxManage modifyvm  ${DOCKER_HOST_VM_NAME} --memory ${MEMORY}
-VBoxManage modifyvm  ${DOCKER_HOST_VM_NAME} --cpus ${CPUs}
-VBoxManage startvm   ${DOCKER_HOST_VM_NAME} --type headless
-```
-
-Make sure your containers have addressable hostnames:
-```
-cat <<EOF | sudo tee -a /etc/hosts > /dev/null
-${DOCKER_HOST_IP} crowd.docker stash.docker bamboo.docker jira.docker confluence.docker
-EOF
-```
-
-Create the nginx image, then bring up the entire stack.
-```
+git clone git@github.com:this/repo.git && cd /Users/$(whoami)/repos/atlassian
 docker build -t nginx_with_config . && docker-compose up
 ```
-
-Note: If you're not using a Linux docker host directly make sure you're running from a shared folder (e.g for OSX `/Users` is shared by default with VirtualBox).
 
 ## Atlassian services
 
@@ -59,34 +34,55 @@ instructions please refere to the origin websites:
 
 ### Preperation
 
-Due to a bug in how Docker deals with local volumes you'll need to symlink from `/atlassian` to your repo.
+There are two ways you might be running Docker:
+
+- Linux Docker Host -> Container (L->C)
+- Workstation (Mac/Windows) -> Linux Docker Host -> Container (W->L->C)
+
+The following instructions will assume you're using a Workstation (Mac) with a Linux Docker Host (managed by Virtualbox VM).
+
+**Shared Folders**
+On Mac `/Users` is shared by default, so a great place to clone this repo is `/Users/$(whoami)/repos/atlassian`. This is important to ensure that shares folders are visable through all three levels W->L->C
+
+**Updating resources on your Docker Host**
+
+WARNING: This will make changes to your docker host, so consider other containers you may be running. Also consider if your workstation has enough resources to support these changes.
 
 ```
-PATH_TO_YOUR_REPO=/data/repos/atlassian
-sudo ln -s ${PATH_TO_YOUR_REPO} /atlassian
-```
-
-Due to the same bug, you'll need to create a custom nginx image.
-
-```
-cd /atlassian && docker build -t nginx_with_config .
-```
-
-Make sure you have enough memory on your Docker host to handle the 7 containers.
-```
-# update your docker host VM with enough resources to handle the entire Atlassian stack
-VM_NAME=default
+# variables
+DOCKER_HOST_VM_NAME=default
+DOCKER_HOST_IP=$(docker-machine ip ${DOCKER_HOST_VM_NAME})
 MEMORY=5120
 CPUs=4
 
-VBoxManage controlvm ${VM_NAME} poweroff
-VBoxManage modifyvm  ${VM_NAME} --memory ${MEMORY}
-VBoxManage modifyvm  ${VM_NAME} --cpus ${CPUs}
-VBoxManage startvm   ${VM_NAME} --type headless
-
-docker stats # to monitor memory usage (confluence may take up to 2GB, give your docker host at least 4GB total)
-docker logs
+# Update your docker host VM to have enough resources for the entire stack.
+VBoxManage controlvm ${DOCKER_HOST_VM_NAME} poweroff
+VBoxManage modifyvm  ${DOCKER_HOST_VM_NAME} --memory ${MEMORY}
+VBoxManage modifyvm  ${DOCKER_HOST_VM_NAME} --cpus ${CPUs}
+VBoxManage startvm   ${DOCKER_HOST_VM_NAME} --type headless
 ```
+
+**Making sure your containers are addressable**
+
+You'll want to access your containers from your browser. To acheive this you should update your hosts file to point to your Docker Host.
+
+```
+# variables
+DOCKER_HOST_VM_NAME=default
+DOCKER_HOST_IP=$(docker-machine ip ${DOCKER_HOST_VM_NAME})
+
+# make sure your containers have addressable hostnames
+cat <<EOF | sudo tee -a /etc/hosts > /dev/null
+${DOCKER_HOST_IP} crowd.docker stash.docker bamboo.docker jira.docker confluence.docker
+EOF
+
+# make sure you forward port 80 from W->L
+PORT_FROM=80
+PORT_TO=80
+VBoxManage controlvm ${DOCKER_HOST_VM_NAME} natpf1 "port${PORT_FROM}_${PORT_TO},tcp,127.0.0.1,${PORT_FROM},,${PORT_TO}"
+```
+
+Now you'll be able to browse addresses like http://crowd.docker from your browser.
 
 ### Start the images
 
